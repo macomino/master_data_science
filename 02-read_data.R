@@ -22,7 +22,7 @@ library(readr)
 ?read_csv
 
 ptm <- proc.time()
-flights <- read_csv('data/flights/2007.csv', progress = T)
+flights <- read_csv('downloads/2007.csv', progress = T)
 proc.time() - ptm
 
 print(object.size(get('flights')), units='auto')
@@ -42,14 +42,14 @@ remove.packages("data.table")
 library(data.table)
 
 ptm <- proc.time()
-flights <- fread("data/flights/2007.csv")
+flights <- fread("downloads/2007.csv")
 proc.time() - ptm
 
 
 # Reading multiple files --------------------------------------------------
 
 
-( data_path <- file.path('data','flights') )
+( data_path <- file.path('downloads') )
 
 ( files <- list.files(data_path, pattern = '*.csv', full.names = T) )
 
@@ -82,13 +82,17 @@ system.time( flights <- data.table::rbindlist(foreach(i = files) %dopar% data.ta
 print(object.size(get('flights')), units='auto')
 unique(flights$Year)
 
+head(flights)
 
+unique(flights$UniqueCarrier)
+table(flights$UniqueCarrie, flights$Year)
+barplot(table(flights$UniqueCarrie))
 
 # Reading big files -------------------------------------------------------
 
 # Some times system commands are faster
-system('head -5 data/flights/2008.csv')
-readLines("data/flights/2008.csv", n=5)
+system('head -5 downloads/2008.csv')
+readLines("downloads/2008.csv", n=5)
 
 # Num rows
 length(readLines("data/flights/2008.csv")) # Not so big files
@@ -98,11 +102,11 @@ nrow(data.table::fread("data/flights/2008.csv", select = 1L, nThread = 2)) # Usi
 
 # Reading only what I neeed
 library(sqldf)
-jfk <- sqldf::read.csv.sql("data/flights/2008.csv", 
+jfk <- sqldf::read.csv.sql("downloads/2008.csv", 
                            sql = "select * from file where Dest = 'JFK'")
 head(jfk)
 
-data.table::fread("data/flights/2008.csv", select = c("UniqueCarrier","Dest","ArrDelay" ))
+data.table::fread("downloads/2008.csv", select = c("UniqueCarrier","Dest","ArrDelay" ))
 
 
 # Using other tools

@@ -61,7 +61,7 @@ for (indice in vector) {
 calendario <- seq(2000, 2019 , by = 1)
 
 for (ano in calendario){
-  print(paste("El año es", ano))
+  print(paste("El a?o es", ano))
 }
 
 ano_actual <- as.numeric(format(Sys.Date(),'%Y'))
@@ -71,22 +71,24 @@ library(lubridate)
 ano_actual <- year(Sys.Date())
 
 for (ano in calendario){
-  ifelse(ano == ano_actual, print(paste("El año es", ano)), print(ano))
+  ifelse(ano == ano_actual, print(paste("El a?o es", ano)), print(ano))
 }
 
 lapply( calendario, print)
 
-lapply( calendario, function(ano) ifelse(ano == ano_actual, print(paste("El año es", ano)), print(ano)))
+?lapply
 
-# Más limpio
+lapply( calendario, function(ano) ifelse(ano == ano_actual, print(paste("El a?o es", ano)), print(ano)))
+
+# M?s limpio
 
 busca_ano_actual <- function(ano) {
-  resultado <- if(ano == ano_actual) {
-    resultado_2 <- paste( ano, "es el año actual")
+  if(ano == ano_actual) {
+    resultado_2 <- paste( ano, "es el a?o actual")
   } else {
-    resultado_2 <- paste( ano, "no es el año actual")
+    resultado_2 <- paste( ano, "no es el a?o actual")
   }
-  return(resultado)
+  return(resultado_2)
 }
 
 busca_ano_actual(2000)
@@ -97,18 +99,36 @@ sapply(calendario, busca_ano_actual)
 
 # Ejercicio ---------------------------------------------------------------
 
-# Año bisiesto: Haz una función que compruebe si un año es o no es bisiesto
+# A?o bisiesto: Haz una funcion que compruebe si un a?o es o no es bisiesto
 # https://es.wikipedia.org/wiki/A%C3%B1o_bisiesto#Algoritmo_computacional
-# Un año es bisiesto si es divisible entre cuatro y (no es divisible entre 100 ó es divisible entre 400).
+# Un a?o es bisiesto si es divisible entre cuatro y (no es divisible entre 100 ó es divisible entre 400).
 
-`%%` #División de enteros
+es_bisiesto <- function(year){
+  if((year %% 4 == 0 & year %% 100 != 0) | year %% 400 == 0)
+  {
+     result <- T
+  }
+  else
+  {
+    result <- F
+  }
+  
+  return(result) 
+}
 
-# Función:
 
-# Aplica a todos los años del calendario la función anterior para comprobar cuáles son años bisiestos
+es_bisiesto(2300)
+`%%` #Division de enteros
 
-# Guarda los años bisiestos en un vector
+# Funcion:
 
+# Aplica a todos los a?os del calendario la funcion anterior para comprobar cuales son a?os bisiestos
+lapply(calendario, es_bisiesto)
+
+# Guarda los a?os bisiestos en un vector
+
+calendario[sapply(calendario, es_bisiesto)]
+get
 
 
 
