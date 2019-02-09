@@ -31,7 +31,7 @@ library(dplyr)
 
 flights[c('ActualElapsedTime','ArrDelay','DepDelay')] # base R
 
-select(flights, ActualElapsedTime, ArrDelay, DepDelay)
+select(flights, ActualElapsedTime, ArrDelay, DepDelay) #Primer parametro el dataframe, el resto son los nombres de las columnas
 
 # Funciones de ayuda
 
@@ -42,9 +42,14 @@ select(flights, ActualElapsedTime, ArrDelay, DepDelay)
 # num_range(“x”, 1:5): the variables named x01, x02, x03, x04 and x05
 # one_of(x): every name that appears in x, which should be a character vector
 
-select(flights, Origin:Cancelled)
+select(flights, Origin:Cancelled) # Selecciona el rango de columnas desde origin a cancelled
 select(flights, -(DepTime:AirTime))
 select(flights, UniqueCarrier, FlightNum, contains("Tail"), ends_with("Delay"))
+
+
+iris <- as_data_frame(iris)
+class(iris)
+iris
 
 # MUTATE() ----------------------------------------------------------------------------
 
@@ -64,8 +69,8 @@ foo <- mutate(flights,
 #  avg_speed traveled by the plane for each flight (in mph). 
 # Hint: Average speed can be calculated as distance divided by number of hours of travel, and note that AirTime is given in minutes
 ##########################################################################
-
-
+foo2 <- mutate(flights, avg_speed = Distance / (AirTime / 60))
+select(foo2, Distance, AirTime, avg_speed)
 
 
 # FILTER() --------------------------------------------------------------------------
@@ -103,15 +108,20 @@ filter(flights, Cancelled == 1, DepDelay > 0)
 # but had a total taxiing time below 15 minutes?
 # 1) Select the flights that had JFK as their destination and assign the result to jfk
 
+library(chron)
+
+
+
+JFK <- filter(flights, Dest == 'JFK')
 
 # 2) Combine the Year, Month and DayofMonth variables to create a Date column
-
+JFK <- mutate(JFK, DateStr = as.Date(paste0(DayofMonth, '/', Month, '/', Year), "%m/%d/%Y")   )
 
 # 3) Result:
-
+nrow(filter(JFK, DayOfWeek %in% c(6,7), Distance > 1000, TaxiIn + TaxiOut < 15))
 
 # 4) Delete jfk object to free resources 
-
+rm (JFK)
 
 # ARRANGE() --------------------------------------------------------------------------
 
@@ -166,7 +176,7 @@ summarise(na_array_delay,
           latest = max(ArrDelay), 
           sd = sd(ArrDelay))
 
-hist(na_array_delay$ArrDelay)
+hist(log(na_array_delay$ArrDelay), breaks=200)
 
 rm(na_array_delay)
 
@@ -176,7 +186,7 @@ taxi <- filter(flights, !is.na(TaxiIn), !is.na(TaxiOut))
 ##########################################################################
 # Exercise: 
 # Print the maximum taxiing difference of taxi with summarise()
-
+summarize(taxi,  max_dist = max(abs(TaxiOut - TaxiIn)))
 
 
 
@@ -203,8 +213,7 @@ aa <- filter(flights, UniqueCarrier == "AA")
 # p_canc: the percentage of cancelled flights,
 # avg_delay: the average arrival delay of flights whose delay is not NA.
 
-
-
+summarize(aa,  n_flights = n(), cancelled = sum(Cancelled == 1), per = cancelled * 100 / n_flights, avg = mean(!is.na(ArrDelay)))
 
 
 
@@ -225,9 +234,9 @@ mean(foo > 5)
 # n_security: the total number of cancelled flights by security reasons,
 # CancellationCode: reason for cancellation (A = carrier, B = weather, C = NAS, D = security)
 
+summarize(aa, n_security=sum(!is.na(CancellationCode) & CancellationCode=='D'))
 
-
-
+table(aa$Origin, aa$CancellationCode)
 
 # %>% OPERATOR ----------------------------------------------------------------------
 
@@ -263,7 +272,10 @@ flights %>%
 # time that is earlier than their departure time. Only include flights that have 
 # no NA values for both DepTime and ArrTime in your count.
 
-
+flights %>%  
+  filter(!is.na(DepTime) & !is.na(ArrTime)) %>% 
+  filter(ArrTime < DepTime) %>% 
+  summarise(n())
 
 
 
