@@ -40,7 +40,7 @@ airbnb %>%
   collapse_by(period = "2 hour", clean = TRUE, side = "start") %>%
   group_by(last_modified) %>%
   summarise(median_price = median(price)) %>% 
-  head
+  head(20)
 
 airbnb %>%
   collapse_by(period = "2 hour", clean = TRUE, side = "start", start_date = "2014-08-01 15:00:00") %>%
@@ -61,6 +61,6 @@ airbnb_plot <- airbnb %>%
   mutate(price = log10(price)) %>% 
   qmplot(longitude, latitude, data = ., geom = "blank") +
   geom_point(aes(color = price), alpha = .2, size = .3) +
-  scale_color_continuous(low = "red", high = "blue")
+  scale_color_continuous(low = "blue", high = "green")
 
 airbnb_plot

@@ -32,7 +32,8 @@ library(stringr)
 #----------------------------------------------------------------------------
 
 
-url_madrid <- "http://resultados.elpais.com/elecciones/2011/municipales/12/28/79.html"
+#url_madrid <- "http://resultados.elpais.com/elecciones/2011/municipales/12/28/79.html"
+url_madrid <- "https://resultados.elpais.com/elecciones/2011/municipales/07/13/05.html"
 html_madrid <- read_html(url_madrid)
 
 partidos <- html_madrid %>% html_nodes(".nombrePartido") %>% html_text()
@@ -81,8 +82,13 @@ head(opiniones, 3)
 # Deberás obtener sólo las opiniones correspondientes a las anteriores opiniones. 
 # Estas se encuentran dentro de una etiqueta HTML con una clase "a-icon-star" 
 # que a su vez están dentro de un div con id "cm_cr-review_list"
-estrellas <- 
-  
+estrellas <- data_frame( html_libro %>% 
+  html_nodes("#cm_cr-review_list") %>% 
+    html_nodes(".a-icon-star") %>% 
+  html_text() %>% 
+  str_sub(0, 3) %>% 
+    str_replace(',', '.') %>% 
+    as.numeric)
   
 
 
@@ -96,10 +102,35 @@ estrellas <-
 url <- "https://www.amazon.es/Cincuenta-Sombras-Grey-L-James/product-reviews/1101910461/ref=cm_cr_getr_d_show_all?ie=UTF8&reviewerType=all_reviews&pageNumber="
 
 
+opiniones_amazon <- NULL
 
+for(i in 1:30) { 
+  url <- paste0( "https://www.amazon.es/Cincuenta-Sombras-Grey-L-James/product-reviews/1101910461/ref=cm_cr_getr_d_show_all?ie=UTF8&reviewerType=all_reviews&pageNumber=", i)
+  
+  
+  html_libro2 <- url %>% 
+    read_html()
+  
+  opiniones <- html_libro2 %>% 
+    html_nodes(".review-text") %>% 
+    html_text()
+  
+  estrellas <-  html_libro2 %>% 
+                             html_nodes("#cm_cr-review_list") %>% 
+                             html_nodes(".a-icon-star") %>% 
+                             html_text() %>% 
+                             str_sub(0, 3) %>% 
+                             str_replace(',', '.') %>% 
+                             as.numeric
+  frame <- tibble(rep(i, 8) , opiniones, estrellas)
+  
+ 
+  colnames(frame) <- c("pagina","opinion","estrellas")
+  
+  opiniones_amazon<-rbind (opiniones_amazon,frame)
 
-
-
+  
+}
 
 
 
@@ -116,12 +147,12 @@ opiniones_amazon <- opiniones_amazon %>%
   mutate(n_words = stringr::str_count(opinion, ' ') ) %>% 
   filter(n_words > 50)
 
-# opiniones_amazon <- read_csv('data/opiniones_amazon_50_sombras.csv')
+ #opiniones_amazon <- read_csv('data/opiniones_amazon_50_sombras.csv')
 
 
 # Calcular el sentimiento de cada opinión
 
-gl_auth('cpb100-162913-eb077c530ef4.json')
+gl_auth('cpb100-162913-faf075966c64.json')
 
 # sentimiento <- read_rds('data/sentimiento.rds')
 # head(sentimiento)
@@ -172,11 +203,19 @@ article_url <- "https://itb.dk/maerkesager/privacy-og-sikkerhed/seks-nye-nationa
 
 # Ejercicio: Extraer el texto del articlo y traducirlo a espanol.
 # Usa la funcion gl_translate()
+ 
+  
+text <-   article_url %>% 
+  read_html() %>% 
+  html_nodes(".post-content") %>% 
+  html_nodes("p") %>% 
+html_text()
 
-results <- 
+
+results <- gl_translate(text, target = "es")
   
   
-  
+results
   
   
 

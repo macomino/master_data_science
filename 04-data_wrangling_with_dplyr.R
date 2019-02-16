@@ -303,7 +303,7 @@ rank(c(21, 22, 24, 23))
 flights %>% 
   filter(!is.na(ArrDelay)) %>% 
   group_by(UniqueCarrier) %>% 
-  summarise(p_delay = sum(ArrDelay >0)/n()) %>% 
+  summarise(p_delay = paste( 100 *  sum(ArrDelay >0)/n(),'%')) %>% 
   mutate(rank = rank(p_delay)) %>% 
   arrange(rank) 
 
@@ -315,14 +315,23 @@ flights %>%
 # of the delayed flights. Again add a new variable rank to the summary according to 
 # avg. Finally, arrange by this rank variable.
 
-
-
+flights %>% 
+  filter(ArrDelay > 0 & !is.na(ArrDelay)) %>% 
+    group_by(UniqueCarrier) %>% 
+      summarise(p_delay = sum(ArrDelay) / n()) %>%  
+        mutate(rank = rank(p_delay)) %>% 
+          arrange(rank) 
 
 
 
 # 2) How many airplanes only flew to one destination from JFK? 
 # The result contains only a single column named nplanes and a single row.
-
+flights %>% 
+  filter(Origin == 'JFK') %>% 
+    group_by(Dest) %>% 
+      summarise(nplanes = n_distinct(Dest)) %>% 
+  filter(nplanes == 1) %>% 
+  summarise(nplanes = n())
 
 
 
@@ -460,7 +469,7 @@ flights %>%
 ##########################################################################
 # Run the follow statements step by step and trying to understand what they do
 
-flights %>% 
+pp <- flights %>% 
   group_by(UniqueCarrier, Dest) %>% 
   summarise(n = n()) %>%
   ungroup() %>% 
@@ -483,7 +492,7 @@ flights %>%
 
 flights %>% 
   head(20) %>% 
-  unite("code", UniqueCarrier, TailNum, sep = "-") %>% 
+  unite("code", UniqueCarrier, TailNum, sep = "#") %>% 
   select(code) %>% 
   separate(code, c("code1", "code2")) %>% 
   separate(code2, c("code3", "code4"), -3)
@@ -528,7 +537,10 @@ flights2 %>%
 # Exercises:
 # Join flights2 with airports dataset
 
-
+flights2 %>% 
+  head(10) %>% 
+left_join(airports, by = c("Origin"="iata")) %>% 
+  left_join(airports, by = c("Dest"="iata"))
 
 
 
