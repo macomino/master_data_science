@@ -24,7 +24,7 @@ gapminder
 ?gapminder
 summary(gapminder)
 
-glimpse(gapminder)
+?glimpse(gapminder)
 
 dim(gapminder)
 
@@ -46,11 +46,33 @@ ggplot(gapminder, aes(x = gdpPercap, y = lifeExp)) + geom_point() + scale_x_log1
 ggplot(gapminder, aes(x = gdpPercap, y = lifeExp, color = continent))  + geom_point() + scale_x_log10()  + geom_smooth(se=F, lwd=1)
 
 
+ggplot(gapminder, aes(x = gdpPercap, y = lifeExp, color = continent))  + geom_point() + scale_x_log10()  + geom_smooth(se=F, lwd=1)  + facet_wrap(~ continent, scales="free_y")
+
+
+
+
+
+
+library(plotly)
+
+gg <- ggplot(diamonds, aes(carat)) +
+  geom_histogram()
+
+p <- ggplotly(gg)
+
+p
+
+
+
+
 # Todo junto:
 p <- ggplot(gapminder, aes(gdpPercap, lifeExp))
 p <- p + aes(color = continent) + geom_point() 
 p <- p + scale_x_log10() + aes(color = continent) + geom_point() + geom_smooth(se=F, lwd=1)
 p
+
+ggplotly(p)
+
 
 gappminder_plot <- ggplot(gapminder) +
   aes(x = gdpPercap, y = lifeExp, colour = continent,
@@ -156,7 +178,8 @@ gappminder_plot + theme_grey()  + theme_minimal() + theme(
   panel.grid.minor.x = element_blank()
 ) 
 
-# Con ggthemes: library("ggthemes")
+# Con ggthemes: 
+library("ggthemes")
 
 gappminder_plot + theme_excel() + scale_fill_excel()
 
@@ -192,7 +215,7 @@ ggsave("gapminder.png", width = 6, height = 4)
 # brew install imagemagick
 # Source: https://github.com/dgrtwo/gganimate
 # install.packages("cowplot")  # a gganimate dependency
-# devtools::install_github("dgrtwo/gganimate")
+ devtools::install_github("dgrtwo/gganimate")
 
 library(gganimate)
 theme_set(theme_minimal())  # pre-set the bw theme.
